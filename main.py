@@ -4,7 +4,6 @@ from flask import Flask, jsonify
 from faker import Faker
 import requests
 import threading
-import time
 import re
 import os
 
@@ -188,4 +187,4 @@ def main(domain):
     return jsonify(domain_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
