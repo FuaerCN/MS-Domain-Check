@@ -1,0 +1,8 @@
+{
+    "name": "MS-Domain-Check",
+	"description": "Deploy MS-Domain-Check",
+	"repository": "https://github.com/FuaerCN/MS-Domain-Check",
+	"website": "https://yam.ink",
+	"keywords": ["MS-Domain-Check"],
+	"stack": "container"
+}
