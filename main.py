@@ -7,7 +7,7 @@ import threading
 import re
 import os
 
-os.system('nohup tor -f /etc/tor/torrc >/dev/null &')
+
 fake = Faker()
 proxies = {'http': 'socks5://127.0.0.1:9150', 'https': 'socks5://127.0.0.1:9150'}
 signup_url = 'https://signup.microsoft.com/signup'
@@ -144,7 +144,7 @@ def ms(domain):
     return jsonify(domain_data)
 
 
-@app.route('/domain=<domain>')
+@app.route('/dm=<domain>')
 def main(domain):
     regexs = re.compile("^(?!-)[A-Za-z0-9-]+([\\-\\.]{1}[a-z0-9]+)*\\.[A-Za-z]{2,6}$")
     if(re.search(regexs, domain)):
@@ -175,4 +175,5 @@ def main(domain):
     return jsonify(domain_data)
 
 if __name__ == '__main__':
+    os.system('nohup tor -f /etc/tor/torrc >/dev/null &')
     app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
