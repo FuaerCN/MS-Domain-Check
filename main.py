@@ -35,13 +35,12 @@ class MyThread(threading.Thread):
 def get_state(domain):
     url = f'https://login.windows.net/{domain}/.well-known/openid-configuration'
     try:
-        page_text = requests.get(url, timeout=20).text
+        page_text = requests.get(url, timeout=30).text
         if 'token_endpoint' in page_text:
             domain_state = True
         else:
             domain_state = False
-    except Exception as err:
-        print('get_state Error: ' + str(err))
+    except:
         domain_state = get_state(domain)
         
     return domain_state
@@ -57,13 +56,12 @@ def get_admin(domain):
         'StepsData.Email': 'Yam@' + domain
     }
     try:
-        result_text = requests.post(signup_url, headers=headers, data=post_data, proxies=proxies, timeout=20).text
+        result_text = requests.post(signup_url, headers=headers, data=post_data, proxies=proxies, timeout=30).text
         if "Go back" in result_text:
             domain_admin = False
         else:
             domain_admin = True
-    except Exception as err:
-        print('get_admin Error: ' + str(err))
+    except:
         switch_proxy()
         domain_admin = get_admin(domain)
         
@@ -80,15 +78,14 @@ def get_license(domain):
             'SkuId': 'education',
             'StepsData.Email': 'Yam@' + domain
         }
-        result_text = requests.post(signup_url, headers=header, data=post_data, proxies=proxies, timeout=20).text
+        result_text = requests.post(signup_url, headers=header, data=post_data, proxies=proxies, timeout=30).text
         if "sku_314c4481-f395-4525-be8b-2ec4bb1e9d91" in result_text:
             domain_license = 'Office 365 A1'
         elif "sku_e82ae690-a2d5-4d76-8d30-7c6e01e6022e" in result_text:
             domain_license = 'Office 365 A1 Plus'
         else:
             domain_license = 'unknown'
-    except Exception as err:
-        print('get_license Error: ' + str(err))
+    except:
         switch_proxy()
         domain_license = get_license(domain)
     
@@ -97,16 +94,16 @@ def get_license(domain):
 
 def get_azure(domain):
     try:
-        url = f'https://az.msaz.workers.dev/domain={domain}'
-        result_text = requests.get(url, timeout=20).text
-        if "true" in result_text:
+        result_text = requests.get(f'https://azck.msaz.tk/dm={domain}', timeout=30).text
+        if result_text == '' or 'DOCTYPE' in result_text:
+            domain_azure = get_azure(domain)
+        elif "true" in result_text:
             domain_azure = True
         elif "school" in result_text:
             domain_azure = False
         else:
             domain_azure = result_text
-    except Exception as err:
-        print('get_azure Error: ' + str(err))
+    except:
         domain_azure = get_azure(domain)
     
     return domain_azure
@@ -138,11 +135,7 @@ def ms(domain):
             more_get_license.join()
             #输出线程执行方法后的的返回值
             #print(more_get_admin.get_result())
-            domain_data = [domain,
-                           domain_state,
-                           more_get_admin.get_result(),
-                           more_get_license.get_result()
-                           ]
+            domain_data = [domain, domain_state, more_get_admin.get_result(), more_get_license.get_result()]
         else:
             domain_data = [domain, domain_state]
     else:
@@ -172,17 +165,12 @@ def main(domain):
             more_get_azure.join()
             #输出线程执行方法后的的返回值
             #print(more_get_admin.get_result())
-            domain_data = [domain,
-                           more_get_azure.get_result(),
-                           domain_state,
-                           more_get_admin.get_result(),
-                           more_get_license.get_result()
-                           ]
+            domain_data = [domain, more_get_azure.get_result(), domain_state, more_get_admin.get_result(), more_get_license.get_result()]
         else:
             domain_azure = get_azure(domain)
             domain_data = [domain, domain_azure, domain_state]
     else:
-        domain_data = [domain,'Invalid Domain Name']
+        domain_data = [domain, 'Invalid Domain Name']
     
     return jsonify(domain_data)
 
